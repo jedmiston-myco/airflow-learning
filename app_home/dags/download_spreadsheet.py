@@ -1,18 +1,30 @@
 # Source: http://blog.adnansiddiqi.me/getting-started-with-apache-airflow/?utm_source=r_dataengineering_airflow&utm_medium=reddit_dataengineering&utm_campaign=c_r_dataengineering_airflow
 import datetime as dt
-
+# 1kk66PHTec3GaSpTBX4gGQalusH6oYlVAHPEaqG3i2Qk
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
- 
- 
-def greet():
-    print('Writing in file')
-    with open('greet.txt', 'a+', encoding='utf8') as f:
+import pygsheets
+import os
+import pandas as pd
+
+def acquire_sheet():
+    gc = pygsheets.authorize(service_file=os.environ["SERVICE_ACCOUNT_JSON"])
+    sh = gc.open_by_key(os.environ["SERVICE_ACCOUNT_KEY"])
+    wks = sh.worksheet_by_title('Sheet1')
+    rec = wks.get_all_records()
+    df = pd.DataFrame.from_records(rec, columns=None)
+    print(df)
+    with open('download.txt', 'a+', encoding='utf8') as f:
         now = dt.datetime.now()
         t = now.strftime("%Y-%m-%d %H:%M:%S")
         f.write(str(t) + '\n')
-    return 'Greeted'
+        f.write(df.to_string())
+        f.write("\n")
+        f.write(os.getcwd())
+        
+    return 'Acquired'
+
 def respond():
     return 'Greet Responded Again'
 
@@ -21,20 +33,20 @@ default_args = {
     'concurrency': 1,
     'retries': 0
 }
-#print("Start date", default_args["start_date"].strftime("%y-%m-%d %H:%M"))
+
 print("Now %s" % dt.datetime.utcnow().strftime("%y-%m-%d %H:%M"))
-with DAG('my_simple_dag',
+with DAG('download_spreadsheet', 
          default_args=default_args,
-         start_date=dt.datetime(2019,1,1,0,0),
-         schedule_interval='*/2 * * * *',
+         start_date=dt.datetime(2019, 1, 1, 0, 0),
+         schedule_interval='*/3 * * * *',
          ) as dag:
     opr_hello = BashOperator(task_id='say_Hi',
                              bash_command='echo "Hi!!"')
  
-    opr_greet = PythonOperator(task_id='greet',
-                               python_callable=greet)
+    opr_download = PythonOperator(task_id='acquire',
+                                  python_callable=acquire_sheet)
     opr_sleep = BashOperator(task_id='sleep_me',
                              bash_command='sleep 5')
     opr_respond = PythonOperator(task_id='respond',
                                  python_callable=respond)
-opr_hello >> opr_greet >> opr_sleep >> opr_respond
+opr_hello >> opr_download >> opr_sleep >> opr_respond
