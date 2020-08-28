@@ -3,6 +3,18 @@ This repository is an evolving source of basic examples I've built for my own ed
 ## Sources
 * [Blog](http://blog.adnansiddiqi.me/getting-started-with-apache-airflow/?utm_source=r_dataengineering_airflow&utm_medium=reddit_dataengineering&utm_campaign=c_r_dataengineering_airflow)
 
+# Quick setup
+* Set up `.env` file in project base from `.env.sample`. Acquire service account credentials from a GCP project. Then:
+* `docker-compose build`
+* `docker-compose up -d` to start webserver
+* `docker exec -it af-compose /bin/bash` to log into running container
+* `airflow scheduler` to start the jobs
+
+# ENV vars
+You require to set up the pygsheets library, recommended with a service account (json file download). It's assumed this json file lives in the app_home shared volume. 
+You'll also need the key to a google sheet (which is invited to the service account's email) set in the host environment.
+These should be set in SERVICE_ACCOUNT_JSON, and SERVICE_ACCOUNT_KEY, respectively. 
+
 # Build and basic startup (without `entrypoint.sh` script)
 In this case we build the image, start up the container with a live `bash` session, and execute the airflow initialization and scheduler/webserver. 
 * `docker build -t af .`
@@ -25,6 +37,11 @@ In this case we use the `entrypoint.sh` script which starts up the webserver aut
 * `docker run --rm -p 8080:8080  --name af-run -v ${PWD}/app_home:/app -it af ` <- should startup using entrypoint script with default arg of `webserver`. 
 * `docker container ls` -- shows that container named `af-run` is running
 * `docker exec -it af-run /bin/bash` will allow live interaction with the container, from there one starts the scheduler with `airflow scheduler`. 
+
+## In recognition of the ENV changes above, the commands above should add the env vars via:
+`docker exec -e SERVICE_ACCOUNT_JSON -e SERVICE_ACCOUNT_KEY  -it af-run /bin/bash`
+`docker run -e SERVICE_ACCOUNT_JSON SERVICE_ACCOUNT_KEY --rm -p 8080:8080  --name af-run -v ${PWD}/app_home:/app -it af /bin/bash`
+
 
 ## Debugging airflow issues
 * From [this link](https://stackoverflow.com/a/49047832):
