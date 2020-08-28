@@ -4,7 +4,7 @@ This repository is an evolving source of basic examples I've built for my own ed
 * [Blog](http://blog.adnansiddiqi.me/getting-started-with-apache-airflow/?utm_source=r_dataengineering_airflow&utm_medium=reddit_dataengineering&utm_campaign=c_r_dataengineering_airflow)
 
 # Quick setup
-* Set up `.env` file in project base. 
+* Set up `.env` file in project base from `.env.sample`. Acquire service account credentials from a GCP project. Then:
 * `docker-compose build`
 * `docker-compose up -d` to start webserver
 * `docker exec -it af-compose /bin/bash` to log into running container

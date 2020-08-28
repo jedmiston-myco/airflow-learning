@@ -1,11 +1,10 @@
 # Source: http://blog.adnansiddiqi.me/getting-started-with-apache-airflow/?utm_source=r_dataengineering_airflow&utm_medium=reddit_dataengineering&utm_campaign=c_r_dataengineering_airflow
+import os
 import datetime as dt
-# 1kk66PHTec3GaSpTBX4gGQalusH6oYlVAHPEaqG3i2Qk
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
 import pygsheets
-import os
 import pandas as pd
 
 def acquire_sheet():
@@ -14,7 +13,6 @@ def acquire_sheet():
     wks = sh.worksheet_by_title('Sheet1')
     rec = wks.get_all_records()
     df = pd.DataFrame.from_records(rec, columns=None)
-    print(df)
     with open('download.txt', 'a+', encoding='utf8') as f:
         now = dt.datetime.now()
         t = now.strftime("%Y-%m-%d %H:%M:%S")
