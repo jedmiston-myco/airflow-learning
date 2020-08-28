@@ -3,6 +3,12 @@ This repository is an evolving source of basic examples I've built for my own ed
 ## Sources
 * [Blog](http://blog.adnansiddiqi.me/getting-started-with-apache-airflow/?utm_source=r_dataengineering_airflow&utm_medium=reddit_dataengineering&utm_campaign=c_r_dataengineering_airflow)
 
+# Quick setup
+* Set up `.env` file in project base. 
+* `docker-compose build`
+* `docker-compose up -d` to start webserver
+* `docker exec -it af-compose /bin/bash` to log into running container
+* `airflow scheduler` to start the jobs
 
 # ENV vars
 You require to set up the pygsheets library, recommended with a service account (json file download). It's assumed this json file lives in the app_home shared volume. 
