@@ -26,7 +26,7 @@ print("Now %s" % dt.datetime.utcnow().strftime("%y-%m-%d %H:%M"))
 with DAG('my_simple_dag',
          default_args=default_args,
          start_date=dt.datetime(2019,1,1,0,0),
-         schedule_interval='*/2 * * * *',
+         schedule_interval='*/5 * * * *',
          ) as dag:
     opr_hello = BashOperator(task_id='say_Hi',
                              bash_command='echo "Hi!!"')
