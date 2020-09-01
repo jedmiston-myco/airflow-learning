@@ -9,6 +9,20 @@ This repository is an evolving source of basic examples I've built for my own ed
 * `docker-compose up -d` to start webserver
 * `docker exec -it af-compose /bin/bash` to log into running container
 * `airflow scheduler` to start the jobs
+* The `airflow.cfg` file has auth information, use the information [here](https://airflow.apache.org/docs/stable/security.html#web-authentication), or
+```
+from airflow import models, settings
+from airflow.contrib.auth.backends.password_auth import PasswordUser
+user = PasswordUser(models.User())
+user.username = 'jke'
+user.email = 'john@mycoworks.com'
+user.password = 'jke-mcw'
+session = settings.Session()
+session.add(user)
+session.commit()
+session.close()
+exit()
+```
 
 # ENV vars
 You require to set up the pygsheets library, recommended with a service account (json file download). It's assumed this json file lives in the app_home shared volume. 
