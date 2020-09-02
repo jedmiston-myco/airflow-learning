@@ -18,4 +18,4 @@ services:
             - "5000:5000"
         command: webserver
         volumes:
-            - ./app_home:/app
+            - .:/app
