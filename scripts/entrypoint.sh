@@ -11,4 +11,5 @@ export AIRFLOW__WEBSERVER__WEB_SERVER_PORT
 
 cd $AIRFLOW_HOME
 airflow initdb
+# airflow scheduler &
 exec airflow webserver
