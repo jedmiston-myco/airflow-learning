@@ -1,9 +1,20 @@
 # Summary
-This repository is an evolving source of basic examples I've built for my own edification to learn about Airflow. I expect the sophistication of the repository to grow over time. 
-## Sources
+Basic airflow app running on Cloud Run or local computer. 
 * [Blog](http://blog.adnansiddiqi.me/getting-started-with-apache-airflow/?utm_source=r_dataengineering_airflow&utm_medium=reddit_dataengineering&utm_campaign=c_r_dataengineering_airflow)
 
-# Quick setup
+
+# Airflow setup -- sequence
+* The sequence I used to get up to speed was
+1. Set up basic airflow env off of sqlite database (the default config(
+2. Set up a Google Cloud SQL database (postgres) and use that as the metadata database (whitelist local computer's IP address)
+3. Add an admin user to the metadata database and enable authentication. 
+4. Set up a Dockerfile which utilizes the global value `PORT` which Cloud Run provides, and plugs that into the webserver port variable in the `airflow.cfg` (`web_server_port`, or `AIRFLOW__WEBSERVER__WEB_SERVER_PORT`). 
+5. Set up the Cloud SQL connection, using the web GUI for `Connections` ![Fig](cloud_run_connections.png?raw=true "Connection  setup"), or use the command line instructions [here](https://cloud.google.com/sql/docs/postgres/tutorial-connect-run). 
+6. Set the env var `AIRFLOW__CORE__SQL_ALCHEMY_CONN` on the cloud run app using the connection string provided by `sqlalchemy.engine.url.URL(drivername="postgres+pg8000", username="postgres", password="dbpass", database="postgres", query={'unix_sock':"/cloudsql/{}/.s.PGSQL.5432".format("imagegrok-app:us-central1:airflow-metadata")})`
+7. Upon deployment, accessing the URL should lead to the login page and the same metadata database. 
+
+
+# Quick setup - local development
 * Set up `.env` file in project base from `.env.sample`. Acquire service account credentials from a GCP project. Then:
 * `docker-compose build`
 * `docker-compose up -d` to start webserver
@@ -28,34 +39,6 @@ exit()
 You require to set up the pygsheets library, recommended with a service account (json file download). It's assumed this json file lives in the app_home shared volume. 
 You'll also need the key to a google sheet (which is invited to the service account's email) set in the host environment.
 These should be set in SERVICE_ACCOUNT_JSON, and SERVICE_ACCOUNT_KEY, respectively. 
-
-# Build and basic startup (without `entrypoint.sh` script)
-In this case we build the image, start up the container with a live `bash` session, and execute the airflow initialization and scheduler/webserver. 
-* `docker build -t af .`
-* `docker build -t af . --no-cache`
-* `docker run -p 8080:8080 -v ${PWD}/app_home:/app -it af /bin/bash`
-* Then, within the running session, on one shell session:
-* `airflow initdb`
-* `airflow webserver`
-* On another shell session, look up the docker process with `docker container ls` (in this case, a randomly assigned `affectionate_visvesvaraya`)
-* `docker exec -it affectionate_visvesvaraya /bin/bash`
-* Alternatively, processes can be run on the same session with `-D`.
-* To find the webserver pid on the docker container: 
-* `cat $AIRFLOW_HOME/airflow-webserver.pid`
-* Then start the scheduler `airflow scheduler`
-* Go to `localhost:8080` on your web browser to interact with the airflow admin page. 
-
-# Build and startup with entrypoint script
-In this case we use the `entrypoint.sh` script which starts up the webserver automatically while the container is running. 
-* `docker build -t af .`
-* `docker run --rm -p 8080:8080  --name af-run -v ${PWD}/app_home:/app -it af ` <- should startup using entrypoint script with default arg of `webserver`. 
-* `docker container ls` -- shows that container named `af-run` is running
-* `docker exec -it af-run /bin/bash` will allow live interaction with the container, from there one starts the scheduler with `airflow scheduler`. 
-
-## In recognition of the ENV changes above, the commands above should add the env vars via:
-`docker exec -e SERVICE_ACCOUNT_JSON -e SERVICE_ACCOUNT_KEY  -it af-run /bin/bash`
-`docker run -e SERVICE_ACCOUNT_JSON SERVICE_ACCOUNT_KEY --rm -p 8080:8080  --name af-run -v ${PWD}/app_home:/app -it af /bin/bash`
-
 
 ## Debugging airflow issues
 * From [this link](https://stackoverflow.com/a/49047832):
