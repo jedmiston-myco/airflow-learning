@@ -12,8 +12,10 @@ services:
             - SERVICE_ACCOUNT_JSON
             - SERVICE_ACCOUNT_KEY
             - DATABASE_COPY_URL
+            - AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            - AIRFLOW__WEBSERVER__WEB_SERVER_PORT
         ports:
-            - "8080:8080"
+            - "5000:5000"
         command: webserver
         volumes:
             - ./app_home:/app

@@ -1,5 +1,7 @@
 FROM python:3.7-buster
 
+ENV PYTHONUNBUFFERED True
+
 ARG AIRFLOW_USER_HOME=/app
 WORKDIR /app
 
@@ -29,10 +31,11 @@ COPY . .
 COPY scripts/entrypoint.sh /entrypoint.sh
 COPY config/airflow.cfg ${AIRFLOW_USER_HOME}/airflow.cfg
 
-EXPOSE 8080 5555 8793
+EXPOSE 8080 5555 8793 5000
 
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 ENV AIRFLOW_HOME=${AIRFLOW_USER_HOME}
+
 
 # For a basic instance, you can use this in lieu of the entrypoint/CMD combination: CMD [ "tail", "-f",  "/dev/null" ]
 
