@@ -9,7 +9,8 @@ Basic airflow app running on Cloud Run or local computer.
 2. Set up a Google Cloud SQL database (postgres) and use that as the metadata database (whitelist local computer's IP address)
 3. Add an admin user to the metadata database and enable authentication. 
 4. Set up a Dockerfile which utilizes the global value `PORT` which Cloud Run provides, and plugs that into the webserver port variable in the `airflow.cfg` (`web_server_port`, or `AIRFLOW__WEBSERVER__WEB_SERVER_PORT`). 
-5. Set up the Cloud SQL connection, using the web GUI for `Connections` ![Fig](cloud_run_connections.png?raw=true "Connection  setup"), or use the command line instructions [here](https://cloud.google.com/sql/docs/postgres/tutorial-connect-run). 
+5. Set up the Cloud SQL connection, using the web GUI for `Connections`
+![Fig](cloud_run_connection.png?raw=true "Connection setup"), or use the command line instructions [here](https://cloud.google.com/sql/docs/postgres/tutorial-connect-run). 
 6. Set the env var `AIRFLOW__CORE__SQL_ALCHEMY_CONN` on the cloud run app using the connection string provided by `sqlalchemy.engine.url.URL(drivername="postgres+pg8000", username="postgres", password="dbpass", database="postgres", query={'unix_sock':"/cloudsql/{}/.s.PGSQL.5432".format("imagegrok-app:us-central1:airflow-metadata")})`
 7. Upon deployment, accessing the URL should lead to the login page and the same metadata database. 
 
